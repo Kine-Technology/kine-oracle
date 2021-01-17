@@ -2,6 +2,7 @@ const BN = require('bignumber.js');
 const artifact = artifacts.require("KineOracle");
 const priceDataContract = '0x47DacC92982F833E7e24df4DDC562f133E4E90EA';
 const reporter = me;
+const kaptainAddr = "0x9218dB2504B6010e224a586F0c63537792bEaaD1";
 // anchor Tolerance = 200000000000000000 , 17 个0
 const anchorToleranceMantissa = new BN(2e17);
 
@@ -108,6 +109,6 @@ const configs = [
 ];
 
 module.exports = (deployer) => {
-  deployer.deploy(artifact, priceDataContract, reporter, anchorToleranceMantissa, anchorPeriod, configs, compoundOracle);
+  deployer.deploy(artifact, priceDataContract, reporter, kaptainAddr, anchorToleranceMantissa, anchorPeriod, configs, compoundOracle);
 };
 
