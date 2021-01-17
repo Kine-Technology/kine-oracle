@@ -1,0 +1,69 @@
+{
+  "Contracts": {
+    "WETH": "0xc778417e063141139fce010982780140aa0cd5ab",
+    "kETH": "0xb2E1F083fb566d04bf6eD0be6cB31e3784b013b6",
+    "USDC": "0x433afe89B4e317bbE708Eef3C1b4FFB9401cED3E",
+    "kUSDC": "0xb1b67df7ab084c8a238a2c156fc0b644cfbc994c",
+    "KINE": "0xBd2AEBAa88370160d3B0Dcb530555CA2DcFED681",
+    "kKINE": "0x72b4e75e8a6f596652dbddd5d1b232f5f5dd6574",
+    "WBTC": "0xB593F5511a2189f44Eb855Be159d3dEc41fe782d",
+    "kBTC": "0x08daafa279763c6bf8e67e7107e31556dacb208e",
+    "kMCD": "0x0a6F03E7345B42390614eE070f29e4aABF266331",
+    "EOS": "0xf6d57c12328BDd573975ecF557131371E2B6fB30",
+    "kEOS": "0xA7CD067948dE6cA1Bf5761ffc8D3fcb59De0CF7F",
+    "ANC": "0x8B66dc070e5A94E7a3b381211cbdbFa80202dF93",
+    "kANC": "0x701C051c73246910C441f4522f832e4cF043Fd69",
+    "TKN": "0xd8b717d1E8ccD0D2680CF0ADC023Bfdc2Dc67537",
+    "UniswapFactory": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    "Pair_USDC_WETH": "0x88Cc79DD6490Fe9931F8579FF289dE2d75eE9814",
+    "Pair_KINE_WETH": "0x7d2dF74Dd60d4d22bCe736181e216FdF540e8Fe4",
+    "Pair_WBTC_WETH": "0xDe208Ed5f6fB244a637e9E323D3C8b96EA2f641E",
+    "Pair_EOS_WETH": "0x07a3F3050A35f93a55EA0538Ef39Ce01B76Ed827",
+    "Pair_ANC_WETH": "0xAAFc1fE32183050074F61a91Ea3a87eB52281C19",
+    "Pair_TKN_WETH": "0x6827045653cA6441795beD762F7948b975ffB4ba",
+    "OpenOraclePriceData": "0x47DacC92982F833E7e24df4DDC562f133E4E90EA",
+    "CompoundPriceFeed": "0xAbaA3B0396620c41A5360f20ee5Bd8F1dC515D25",
+    "CompoundPriceFeedForTest": "0x930ADFa6A0881342e96E7BD0Be0F7c6846704eDC",
+    "CompoundPriceFeedHelper": "0x0AF0113076C658C5a5F55c42C3094766B9D7832e",
+    "KinePriceOracle": "0xEa1711994675624cED80082cfCb377E66017A2A3",
+    "KinePriceOracleHelper": "0xf7427573981E89038dFF1dd33dC66F6eF24075B9"
+  },
+  "Tokens": {
+    "WETH": {
+      "name": "Wrapped ETH",
+      "symbol": "WETH",
+      "decimals": 18,
+      "address": "0xc778417e063141139fce010982780140aa0cd5ab"
+    },
+    "USDC": {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "address": "0x5078b88136DCaD19066Da317E03F878e76Fc9AEB"
+    },
+    "KINE": {
+      "name": "KINE Token",
+      "symbol": "KINE",
+      "decimals": 18,
+      "address": "0xBd2AEBAa88370160d3B0Dcb530555CA2DcFED681"
+    },
+    "WBTC": {
+      "name": "Wrapped BTC",
+      "symbol": "WBTC",
+      "decimals": 18,
+      "address": "0xB593F5511a2189f44Eb855Be159d3dEc41fe782d"
+    },
+    "EOS": {
+      "name": "The EOS",
+      "symbol": "EOS",
+      "decimals": 10,
+      "address": "0xB593F5511a2189f44Eb855Be159d3dEc41fe782d"
+    },
+    "ANC": {
+      "name": "The ANC",
+      "symbol": "ANC",
+      "decimals": 10,
+      "address": "0xB593F5511a2189f44Eb855Be159d3dEc41fe782d"
+    }
+  }
+}
