@@ -236,6 +236,7 @@ contract KineOracle is PriceConfig {
 
     function postReporterOnlyPriceInternal(string memory symbol, KTokenConfig memory config, uint reporterPrice) internal {
         require(!reporterInvalidated, "reporter invalidated");
+        require(reporterPrice != 0, "price cannot be 0");
         prices[config.symbolHash] = reporterPrice;
         emit PriceUpdated(symbol, reporterPrice);
     }
