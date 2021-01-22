@@ -2,7 +2,7 @@ const BN = require('bignumber.js');
 const artifact = artifacts.require("KineOracle");
 const priceDataContract = '0x47DacC92982F833E7e24df4DDC562f133E4E90EA';
 const reporter = me;
-const kaptainAddr = "0x9218dB2504B6010e224a586F0c63537792bEaaD1";
+const kaptainAddr = "0x18206A47F49e8cfA7964247e0497Ef27100265Ef";
 // anchor Tolerance = 200000000000000000 , 17 个0
 const anchorToleranceMantissa = new BN(2e17);
 
@@ -13,9 +13,8 @@ const compoundOracle = "0xAbaA3B0396620c41A5360f20ee5Bd8F1dC515D25";
 //     FIXED_ETH, 0 /// implies the fixedPrice is a constant multiple of the ETH price (which varies)
 //     FIXED_USD, 1/// implies the fixedPrice is a constant multiple of the USD price (which is 1)
 //     REPORTER, 2/// implies the price is set by the reporter,
-//     REPORTER_ONLY 3, // implies the price is not anchored and rely on reporter post
-//     UNISWAP_ONLY 4// implies the price only comes from uniswap instead of reporter
-//     COMPOUND 5// implies the price only comes from compound
+//     KAPTAIN 3, // implies the price is not anchored and rely on Kaptain post
+//     COMPOUND 4// implies the price only comes from compound
 
 
 // if we want to support a price, we must add a config with symbol hash and kToken address,
@@ -25,14 +24,14 @@ const compoundOracle = "0xAbaA3B0396620c41A5360f20ee5Bd8F1dC515D25";
 // 2. compound oracle price configs should at least provide config with kToken address and symbolHash,
 // and underlying should be address(0)
 const configs = [
-  // KINE, UNISWAP_ONLY 4
+  // KINE, REPORTER 2
   // "0x29efbd92be462c46e98b70fb4ae10f27d3cc434d","0xBd2AEBAa88370160d3B0Dcb530555CA2DcFED681","0xeb48ef9150b594762681c5b8a89019528e4a6af2dc81fe0a4cc42c194c8cbda1","1000000000000000000","4","0","0x7d2dF74Dd60d4d22bCe736181e216FdF540e8Fe4","false"
   {
-    "kToken": "0x72b4e75e8a6f596652dbddd5d1b232f5f5dd6574",
+    "kToken": "0xaB0061B3e77C79485BD75178948DA95C20eDa9A1",
     "underlying": "0xBd2AEBAa88370160d3B0Dcb530555CA2DcFED681",
     "symbolHash": "0xeb48ef9150b594762681c5b8a89019528e4a6af2dc81fe0a4cc42c194c8cbda1",
     "baseUnit": "1000000000000000000",
-    "priceSource": 4,
+    "priceSource": 2,
     "fixedPrice": 0,
     "uniswapMarket": "0x7d2dF74Dd60d4d22bCe736181e216FdF540e8Fe4",
     "isUniswapReversed": false
@@ -48,29 +47,6 @@ const configs = [
     "priceSource": 3,
     "fixedPrice": 0,
     "uniswapMarket": "0x0000000000000000000000000000000000000000",
-    "isUniswapReversed": false
-  },
-  // EOS, UNISWAP_ONLY 4
-  // ["0xA7CD067948dE6cA1Bf5761ffc8D3fcb59De0CF7F","0xf6d57c12328BDd573975ecF557131371E2B6fB30","0x45dec4690263beb66c81a3dff626a29e2c5ed3fc74f6c30ee96b0d6e324b605e","10000000000","4","0","0x07a3F3050A35f93a55EA0538Ef39Ce01B76Ed827","true"]
-  {
-    "kToken": "0xA7CD067948dE6cA1Bf5761ffc8D3fcb59De0CF7F",
-    "underlying": "0xf6d57c12328BDd573975ecF557131371E2B6fB30",
-    "symbolHash": "0x45dec4690263beb66c81a3dff626a29e2c5ed3fc74f6c30ee96b0d6e324b605e",
-    "baseUnit": "10000000000",
-    "priceSource": 4,
-    "fixedPrice": 0,
-    "uniswapMarket": "0x07a3F3050A35f93a55EA0538Ef39Ce01B76Ed827",
-    "isUniswapReversed": true
-  },
-  // ANC, UNISWAP_ONLY 4
-  {
-    "kToken": "0x701C051c73246910C441f4522f832e4cF043Fd69",
-    "underlying": "0x8B66dc070e5A94E7a3b381211cbdbFa80202dF93",
-    "symbolHash": "0xec0b4220991f5a1dcd40e58717198ced41d6b55a371fe91069b750f795cb6133",
-    "baseUnit": "10000000000",
-    "priceSource": 4,
-    "fixedPrice": 0,
-    "uniswapMarket": "0xAAFc1fE32183050074F61a91Ea3a87eB52281C19",
     "isUniswapReversed": false
   },
   // ETH, COMPOUND   5

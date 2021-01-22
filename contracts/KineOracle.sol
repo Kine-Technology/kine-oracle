@@ -37,6 +37,9 @@ contract KineOracle is PriceConfig {
     /// @notice The Kaptain contract address that steers the MCD price and kUSD minter
     address public kaptain;
 
+    /// @notice The mcd last update timestamp
+    uint public mcdLastUpdatedAt;
+
     /// @notice The highest ratio of the new price to the anchor price that will still trigger the price to be updated
     uint public immutable upperBoundAnchorRatio;
 
@@ -91,6 +94,7 @@ contract KineOracle is PriceConfig {
         uint baseUnit, KPriceSource priceSource, uint fixedPrice, address uniswapMarket, bool isUniswapReversed);
 
     bytes32 constant ethHash = keccak256(abi.encodePacked("ETH"));
+    bytes32 constant mcdHash = keccak256(abi.encodePacked("MCD"));
     bytes32 constant rotateHash = keccak256(abi.encodePacked("rotate"));
 
     /**
@@ -135,9 +139,7 @@ contract KineOracle is PriceConfig {
                 config.priceSource, config.fixedPrice, config.uniswapMarket, config.isUniswapReversed);
             require(config.baseUnit > 0, "baseUnit must be greater than zero");
             address uniswapMarket = config.uniswapMarket;
-            if (config.priceSource == KPriceSource.UNISWAP_ONLY
-                || config.priceSource == KPriceSource.REPORTER
-                || config.symbolHash == ethHash) {
+            if (config.priceSource == KPriceSource.REPORTER || config.symbolHash == ethHash) {
                 require(uniswapMarket != address(0), "prices must have an anchor");
                 bytes32 symbolHash = config.symbolHash;
                 uint cumulativePrice = currentCumulativePrice(config);
@@ -167,9 +169,7 @@ contract KineOracle is PriceConfig {
     }
 
     function priceInternal(KTokenConfig memory config) internal view returns (uint) {
-        if (config.priceSource == KPriceSource.REPORTER_ONLY
-        || config.priceSource == KPriceSource.UNISWAP_ONLY
-            || config.priceSource == KPriceSource.REPORTER) {
+        if (config.priceSource == KPriceSource.KAPTAIN || config.priceSource == KPriceSource.REPORTER) {
             return prices[config.symbolHash];
         }
         if (config.priceSource == KPriceSource.FIXED_USD) return config.fixedPrice;
@@ -222,16 +222,25 @@ contract KineOracle is PriceConfig {
         // Try to update the view storage
         for (uint i = 0; i < symbols.length; i++) {
             KTokenConfig memory config = getKTokenConfigBySymbol(symbols[i]);
+            require(config.symbolHash != mcdHash, "MCD price goes to postMcdPrice");
             // skip for non-kine config, which should have valid underlying address
             if(config.underlying != address(0)){
                 uint reporterPrice = priceData.getPrice(reporter, symbols[i]);
-                if (config.priceSource == KPriceSource.REPORTER_ONLY) {
-                    postReporterOnlyPriceInternal(symbols[i], config, reporterPrice);
-                } else if(config.priceSource != KPriceSource.COMPOUND){
+                if(config.priceSource != KPriceSource.COMPOUND)
                     postPriceInternal(symbols[i], ethPrice, config, reporterPrice);
-                }
             }
         }
+    }
+
+    /**
+     * @dev MCD price can only come from Kaptain
+     */
+    function postMcdPrice(uint mcdPrice) external onlyKaptain{
+        require(!reporterInvalidated, "reporter invalidated");
+        require(mcdPrice != 0, "MCD price cannot be 0");
+        mcdLastUpdatedAt = block.timestamp;
+        prices[mcdHash] = mcdPrice;
+        emit PriceUpdated("MCD", mcdPrice);
     }
 
     function postReporterOnlyPriceInternal(string memory symbol, KTokenConfig memory config, uint reporterPrice) internal {
@@ -242,7 +251,7 @@ contract KineOracle is PriceConfig {
     }
 
     function postPriceInternal(string memory symbol, uint ethPrice, KTokenConfig memory config, uint reporterPrice) internal {
-        require(config.priceSource == KPriceSource.REPORTER || config.priceSource == KPriceSource.UNISWAP_ONLY, "only reporter or uniswap prices get posted");
+        require(config.priceSource == KPriceSource.REPORTER, "only reporter prices get posted");
 
         uint anchorPrice;
 
@@ -252,8 +261,7 @@ contract KineOracle is PriceConfig {
             anchorPrice = fetchAnchorPrice(symbol, config, ethPrice);
         }
 
-        // we allow anyone to sign a message to update uniswap_only prices, it is still TWAP price but maybe newer
-        if (config.priceSource == KPriceSource.UNISWAP_ONLY || reporterInvalidated) {
+        if (reporterInvalidated) {
             prices[config.symbolHash] = anchorPrice;
             emit PriceUpdated(symbol, anchorPrice);
         } else if (isWithinAnchor(reporterPrice, anchorPrice)) {
@@ -405,12 +413,20 @@ contract KineOracle is PriceConfig {
     /// @dev The admin function to add config for supporting more token prices
     function addConfig(address kToken_, address underlying_, bytes32 symbolHash_, uint baseUnit_,
         KPriceSource priceSource_, uint fixedPrice_, address uniswapMarket_, bool isUniswapReversed_) public onlyOwner {
-        KTokenConfig memory config = KTokenConfig({kToken: kToken_, underlying: underlying_, symbolHash: symbolHash_, baseUnit: baseUnit_, priceSource: priceSource_, fixedPrice: fixedPrice_, uniswapMarket: uniswapMarket_, isUniswapReversed: isUniswapReversed_});
+        KTokenConfig memory config =
+        KTokenConfig({
+        kToken: kToken_,
+        underlying: underlying_,
+        symbolHash: symbolHash_,
+        baseUnit: baseUnit_,
+        priceSource: priceSource_,
+        fixedPrice: fixedPrice_,
+        uniswapMarket: uniswapMarket_,
+        isUniswapReversed: isUniswapReversed_
+        });
         require(config.baseUnit > 0, "baseUnit must be greater than zero");
         address uniswapMarket = config.uniswapMarket;
-        if (config.priceSource == KPriceSource.UNISWAP_ONLY
-            || config.priceSource == KPriceSource.REPORTER
-            || config.symbolHash == ethHash) {
+        if (config.priceSource == KPriceSource.REPORTER || config.symbolHash == ethHash) {
             require(uniswapMarket != address(0), "prices must have an anchor");
             bytes32 symbolHash = config.symbolHash;
             uint cumulativePrice = currentCumulativePrice(config);

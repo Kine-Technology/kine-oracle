@@ -14,8 +14,7 @@ contract PriceConfig is Ownable {
         FIXED_ETH, /// implies the fixedPrice is a constant multiple of the ETH price (which varies)
         FIXED_USD, /// implies the fixedPrice is a constant multiple of the USD price (which is 1)
         REPORTER, /// implies the price is set by the reporter,
-        REPORTER_ONLY, /// implies the price is not anchored and rely on reporter post
-        UNISWAP_ONLY, /// implies the price only comes from uniswap instead of reporter
+        KAPTAIN, /// implies the price is not anchored and rely on kaptain post
         COMPOUND /// implies the price only comes from compound oracle
     }
 
