@@ -38,7 +38,7 @@ const configs = [
   },
   // tuple(address,address,bytes32,uint256,uint8,uint256,address,bool):
   // "0xf8DB02d757650d38360B18dC98464B91e2F4D545","0xf8DB02d757650d38360B18dC98464B91e2F4D545","0xb4e390f51b7b166e80aa2bd4ca6a7efd11d137edbc0329a84b39d48eaf9f084c","1000000000000000000","3","0","0x0000000000000000000000000000000000000000","false"
-  // MCD, REPORTER_ONLY 3
+  // MCD, KAPTAIN 3
   {
     "kToken": "0x0a6F03E7345B42390614eE070f29e4aABF266331",
     "underlying": "0x0a6F03E7345B42390614eE070f29e4aABF266331",
@@ -49,35 +49,35 @@ const configs = [
     "uniswapMarket": "0x0000000000000000000000000000000000000000",
     "isUniswapReversed": false
   },
-  // ETH, COMPOUND   5
+  // ETH, COMPOUND   4
   {
     "kToken": "0xb2E1F083fb566d04bf6eD0be6cB31e3784b013b6",
     "underlying": "0x0000000000000000000000000000000000000000",
     "symbolHash": "0xaaaebeba3810b1e6b70781f14b2d72c1cb89c0b2b320c43bb67ff79f562f5ff4",
     "baseUnit": "1000000000000000000",
-    "priceSource": 5,
+    "priceSource": 4,
     "fixedPrice": 0,
     "uniswapMarket": "0x88Cc79DD6490Fe9931F8579FF289dE2d75eE9814",
     "isUniswapReversed": true
   },
-  // USDC as USD, COMPOUND, 5, compound support token so underlying and uniswap market is address(0)
+  // USDC as USD, COMPOUND   4, compound support token so underlying and uniswap market is address(0)
   {
     "kToken": "0xb1b67df7ab084c8a238a2c156fc0b644cfbc994c",
     "underlying": "0x0000000000000000000000000000000000000000",
     "symbolHash": "0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa",
     "baseUnit": "1000000",
-    "priceSource": 5,
+    "priceSource": 4,
     "fixedPrice": 1000000,
     "uniswapMarket": "0x0000000000000000000000000000000000000000",
     "isUniswapReversed": false
   },
-  // BTC, COMPOUND 5, 0x680612239d0cfc1da9fdc5820c057952453a1ca8
+  // BTC, COMPOUND   4, 0x680612239d0cfc1da9fdc5820c057952453a1ca8
   {
     "kToken": "0x08daafa279763c6bf8e67e7107e31556dacb208e",
     "underlying": "0x0000000000000000000000000000000000000000",
     "symbolHash": "0xe98e2830be1a7e4156d656a7505e65d08c67660dc618072422e9c78053c261e9",
     "baseUnit": "1000000000000000000",
-    "priceSource": 5,
+    "priceSource": 4,
     "fixedPrice": 0,
     "uniswapMarket": "0x0000000000000000000000000000000000000000",
     "isUniswapReversed": false
