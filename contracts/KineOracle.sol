@@ -277,7 +277,7 @@ contract KineOracle is PriceConfig {
      */
     function isWithinAnchor(uint reporterPrice, uint anchorPrice) internal view returns (bool) {
         if (reporterPrice > 0) {
-            uint anchorRatio = mul(anchorPrice, 100e16) / reporterPrice;
+            uint anchorRatio = mul(reporterPrice, 100e16) / anchorPrice;
             return anchorRatio <= upperBoundAnchorRatio && anchorRatio >= lowerBoundAnchorRatio;
         }
         return false;
