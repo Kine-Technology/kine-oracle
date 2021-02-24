@@ -5,6 +5,7 @@ pragma solidity ^0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./Ownable.sol";
+import "./UniswapLib.sol";
 
 /// @title Oracle config for Kine Oracle
 /// @author Kine
@@ -36,6 +37,12 @@ contract PriceConfig is Ownable {
 
     /// @dev The dynamic config array
     KTokenConfig[] public kTokenConfigs;
+
+    // @notice Uniswap factory address for pair address check
+    address public uniswapFactory;
+
+    // @notice WETH address for pair address and token order check
+    address public wrappedETHAddress;
 
     function getKConfigIndexByKToken(address kToken) public view returns (uint){
         for (uint i = 0; i < kTokenConfigs.length; i++) {
@@ -96,5 +103,18 @@ contract PriceConfig is Ownable {
         if (index != uint(-1)) {
             return kTokenConfigs[index];
         }
+    }
+
+    /**
+     * @notice Check the KTokenConfig integrity
+     */
+    function checkConfig(KTokenConfig memory config) public view {
+        address pair = UniswapV2OracleLibrary.pairFor(uniswapFactory, wrappedETHAddress, config.underlying);
+        // wrong uniswapFactory address, or wrong WETH address, or wrong underlying address
+        require(pair == config.uniswapMarket, "kTokenConfig uniswap market check failed");
+
+        // check isUniswapReversed flag
+        bool isUniswapReversed = config.underlying < wrappedETHAddress ? false : true;
+        require(isUniswapReversed == config.isUniswapReversed, "kTokenConfig pair order check failed");
     }
 }

@@ -4,7 +4,6 @@ pragma solidity ^0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./OpenOraclePriceData.sol";
-import "./UniswapLib.sol";
 import "./ICompoundOracle.sol";
 import "./PriceConfig.sol";
 import "./UniswapConfig.sol";
@@ -15,6 +14,15 @@ contract KineOracle is PriceConfig {
     struct Observation {
         uint timestamp;
         uint acc;
+    }
+
+    struct KineOracleConfig{
+        address reporter; // The reporter that signs the price
+        address kaptain; // The kine kaptain contract
+        address uniswapFactory; // The uniswap factory address
+        address wrappedETHAddress; // The WETH contract address
+        uint anchorToleranceMantissa; // The percentage tolerance that the reporter may deviate from the uniswap anchor
+        uint anchorPeriod; // The minimum amount of time required for the old uniswap price accumulator to be replaced
     }
 
     using FixedPoint for *;
@@ -108,35 +116,41 @@ contract KineOracle is PriceConfig {
     /**
      * @notice Construct a uniswap anchored view for a set of token configurations
      * @dev Note that to avoid immature TWAPs, the system must run for at least a single anchorPeriod before using.
-     * @param reporter_ The reporter whose prices are to be used
-     * @param anchorToleranceMantissa_ The percentage tolerance that the reporter may deviate from the uniswap anchor
-     * @param anchorPeriod_ The minimum amount of time required for the old uniswap price accumulator to be replaced
+     * @param priceData_ The open oracle price data contract
+     * @param kineOracleConfig_ The configurations for kine oracle init
      * @param configs The static token configurations which define what prices are supported and how
+     * @param compoundOracle_ The address of compound oracle
      */
     constructor(OpenOraclePriceData priceData_,
-        address reporter_,
-        address kaptain_,
-        uint anchorToleranceMantissa_,
-        uint anchorPeriod_,
+        KineOracleConfig memory kineOracleConfig_,
         KTokenConfig[] memory configs,
         ICompoundOracle compoundOracle_) public {
         priceData = priceData_;
-        reporter = reporter_;
-        kaptain = kaptain_;
-        anchorPeriod = anchorPeriod_;
-
+        reporter = kineOracleConfig_.reporter;
+        kaptain = kineOracleConfig_.kaptain;
+        uniswapFactory = kineOracleConfig_.uniswapFactory;
+        wrappedETHAddress = kineOracleConfig_.wrappedETHAddress;
+        anchorPeriod = kineOracleConfig_.anchorPeriod;
         compoundOracle = compoundOracle_;
         emit CompoundOracleUpdated(address(0), address(compoundOracle_));
 
+        uint anchorToleranceMantissa = kineOracleConfig_.anchorToleranceMantissa;
         // Allow the tolerance to be whatever the deployer chooses, but prevent under/overflow (and prices from being 0)
-        upperBoundAnchorRatio = anchorToleranceMantissa_ > uint(-1) - 100e16 ? uint(-1) : 100e16 + anchorToleranceMantissa_;
-        lowerBoundAnchorRatio = anchorToleranceMantissa_ < 100e16 ? 100e16 - anchorToleranceMantissa_ : 1;
+        upperBoundAnchorRatio = anchorToleranceMantissa > uint(-1) - 100e16 ? uint(-1) : 100e16 + anchorToleranceMantissa;
+        lowerBoundAnchorRatio = anchorToleranceMantissa < 100e16 ? 100e16 - anchorToleranceMantissa : 1;
 
         for (uint i = 0; i < configs.length; i++) {
             KTokenConfig memory config = configs[i];
+
+            // configuration integrity check
+            if(config.symbolHash != ethHash && config.priceSource == KPriceSource.REPORTER){
+                checkConfig(config);
+            }
+
             kTokenConfigs.push(config);
             emit TokenConfigAdded(config.kToken, config.underlying, config.symbolHash, config.baseUnit,
                 config.priceSource, config.fixedPrice, config.uniswapMarket, config.isUniswapReversed);
+
             require(config.baseUnit > 0, "baseUnit must be greater than zero");
             address uniswapMarket = config.uniswapMarket;
             if (config.priceSource == KPriceSource.REPORTER || config.symbolHash == ethHash) {
@@ -425,6 +439,12 @@ contract KineOracle is PriceConfig {
         isUniswapReversed: isUniswapReversed_
         });
         require(config.baseUnit > 0, "baseUnit must be greater than zero");
+
+        // configuration integrity check
+        if(config.symbolHash != ethHash && config.priceSource == KPriceSource.REPORTER){
+            checkConfig(config);
+        }
+
         address uniswapMarket = config.uniswapMarket;
         if (config.priceSource == KPriceSource.REPORTER || config.symbolHash == ethHash) {
             require(uniswapMarket != address(0), "prices must have an anchor");
